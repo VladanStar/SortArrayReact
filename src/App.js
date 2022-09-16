@@ -1,34 +1,66 @@
-import {useState} from "react"
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import Header from './components/Header';
-import FeedbackItem from './components/FeedbackItem';
-import FeedbackData from "./data/FeedbackData";
-import FeedbackList from "./components/FeedbackList";
-import Card from "./components/shared/Card";
-import FeedbackStats from "./components/FeedbackStats";
-import FeedbackForm from "./components/FeedbackForm";
+
+const bands = [
+  {
+    id: 1,
+    name: 'Nightwish',
+    albums: 9,
+    members: 6,
+    formed_in: 1996,
+  },
+  {
+    id: 2,
+    name: 'Metallica',
+    albums: 10,
+    members: 4,
+    formed_in: 1981,
+  },
+  {
+    id: 3,
+    name: 'Nirvana',
+    albums: 3,
+    members: 3,
+    formed_in: 1987,
+  },
+];
 
 function App() {
+  const [data, setData] = useState([]);
+  const [sortType, setSortType] = useState('albums');
 
-  const[feedback, setFeedback] = useState(FeedbackData);
-  const deleteFeedback =(id) => {
-    console.log("App",id);
-    if(window.confirm("Are you sure you want to delete")){
-    setFeedback(feedback.filter((item) =>item.id !== id))
-  
-  }}
+  useEffect(() => {
+    const sortArray = type => {
+      const types = {
+        albums: 'albums',
+        members: 'members',
+        formed: 'formed_in',
+      };
+      const sortProperty = types[type];
+      const sorted = [...bands].sort((a, b) => b[sortProperty] - a[sortProperty]);
+      setData(sorted);
+    };
+
+    sortArray(sortType);
+  }, [sortType]);
+
   return (
-   <>
-   <Header />
-    <div className="container">
-      <FeedbackForm />
-      <FeedbackStats feedback ={feedback} />
-    <FeedbackList feedback= {feedback}  handleDelete={deleteFeedback}/>
-    {/* <Card>
-      Hello World
-    </Card> */}
+    <div className="App">
+      <select onChange={(e) => setSortType(e.target.value)}>
+        <option value="albums">Albums</option>
+        <option value="members">Members</option>
+        <option value="formed">Formed in</option>
+      </select>
+
+      {data.map(band => (
+        <div key={band.id} style={{ margin: '30px' }}>
+          <div>{`Band: ${band.name}`}</div>
+          <div>{`Albums: ${band.albums}`}</div>
+          <div>{`Members: ${band.members}`}</div>
+          <div>{`Year of founding: ${band.formed_in}`}</div>
+        </div>
+      ))}
     </div>
-    </>
   );
 }
 
